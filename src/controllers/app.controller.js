@@ -1,9 +1,10 @@
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
 import mailgen from 'mailgen'
+import twilio from 'twilio'
 dotenv.config()
 
-const getbill = (req, res) => {
+export const getbill = (req, res) => {
     const config = {
         service: 'gmail',
         auth: {
@@ -43,8 +44,16 @@ const getbill = (req, res) => {
         html: mail
     }
     transporter.sendMail(message)
-        .then(() => res.status(200).json({ status: 'success', message: 'Getbill...'}))
+        .then(() => res.status(200).json({ status: 'success', message: 'Getbill...' }))
         .catch(err => res.status(500).json({ status: 'error', message: err.message }))
 }
 
-export default getbill
+export const sendSMS = (req, res) => {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = twilio(accountSid, authToken);
+
+    client.messages
+        .create({ body: 'Hola Mundo!!!', from: process.env.TWILLIO_PHONE, to: '+51942270712' })
+        .then(message => console.log(message.sid));
+}
